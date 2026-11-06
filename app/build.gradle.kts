@@ -6,6 +6,8 @@ plugins {
   alias(libs.plugins.google.devtools.ksp)
   alias(libs.plugins.secrets)
   alias(libs.plugins.google.services)
+  alias(libs.plugins.kotlin.serialization)
+  alias(libs.plugins.wire)
 }
 
 android {
@@ -20,6 +22,34 @@ android {
     versionName = "3.0.0"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+  }
+
+  flavorDimensions += "mode"
+  productFlavors {
+    create("standard") {
+      dimension = "mode"
+      applicationId = "com.jarvisai.assistant"
+      buildConfigField("int", "BRIDGE_PORT", "1236")
+      buildConfigField("int", "HUB_PORT", "1237")
+      buildConfigField("int", "BROWSER_MCP_PORT", "8767")
+      buildConfigField("boolean", "IS_SHARED_USER_ID", "false")
+    }
+    create("termux") {
+      dimension = "mode"
+      applicationId = "com.termux"
+      buildConfigField("int", "BRIDGE_PORT", "1234")
+      buildConfigField("int", "HUB_PORT", "1235")
+      buildConfigField("int", "BROWSER_MCP_PORT", "8765")
+      buildConfigField("boolean", "IS_SHARED_USER_ID", "false")
+    }
+    create("termuxShared") {
+      dimension = "mode"
+      applicationId = "com.termux"
+      buildConfigField("int", "BRIDGE_PORT", "1234")
+      buildConfigField("int", "HUB_PORT", "1235")
+      buildConfigField("int", "BROWSER_MCP_PORT", "8765")
+      buildConfigField("boolean", "IS_SHARED_USER_ID", "true")
+    }
   }
 
   // Do not remove or modify these signingConfigs. They are necessary for building, installing,
@@ -157,4 +187,22 @@ dependencies {
   debugImplementation(libs.androidx.compose.ui.tooling)
   "ksp"(libs.androidx.room.compiler)
   // "ksp"(libs.moshi.kotlin.codegen)
+
+  // Termux Terminal Emulator with Native PTY Support
+  implementation("com.github.termux.termux-app:terminal-emulator:v0.118.1")
+  implementation("com.google.guava:listenablefuture:1.0")
+
+  // Wire Protobuf & gRPC runtime for Antigravity Agent
+  implementation(libs.wire.runtime)
+  implementation(libs.wire.grpc.client)
+  implementation(libs.kotlinx.serialization.json)
+}
+
+wire {
+  sourcePath {
+    srcDir("src/main/proto")
+  }
+  kotlin {
+    rpcRole = "client"
+  }
 }

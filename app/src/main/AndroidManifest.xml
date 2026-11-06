@@ -33,6 +33,14 @@
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
+    <permission
+        android:name="${applicationId}.permission.RUN_COMMAND"
+        android:protectionLevel="signature" />
+    <permission
+        android:name="${applicationId}.permission.API"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="${applicationId}.permission.RUN_COMMAND" />
+    <uses-permission android:name="${applicationId}.permission.API" />
     <uses-permission android:name="com.termux.permission.RUN_COMMAND" />
 
     <uses-feature
@@ -288,6 +296,42 @@
             android:name="com.jarvisai.assistant.termux.JarvisTermuxResultReceiver"
             android:enabled="true"
             android:exported="false" />
+
+        <!-- Native Termux Service & Receivers -->
+        <service
+            android:name="com.termux.app.TermuxService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="${applicationId}.permission.RUN_COMMAND" />
+
+        <activity
+            android:name="com.termux.app.TermuxOpenActivity"
+            android:exported="true"
+            android:permission="${applicationId}.permission.RUN_COMMAND"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <receiver
+            android:name="com.termux.app.TermuxSystemReceiver"
+            android:exported="true"
+            android:permission="${applicationId}.permission.RUN_COMMAND">
+            <intent-filter>
+                <action android:name="${applicationId}.RUN_COMMAND" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name="com.termux.app.TermuxOpenReceiver"
+            android:exported="true"
+            android:permission="${applicationId}.permission.RUN_COMMAND">
+            <intent-filter>
+                <action android:name="${applicationId}.OPEN_URL" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
