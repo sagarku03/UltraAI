@@ -2995,7 +2995,8 @@ class LiveAgentToolExecutor(
         } catch (_: Exception) { }
 
         try {
-            WorkingMemoryBlackboard.recordObservation(
+            WorkingMemoryBlackboard.putScratchpadVariable(
+                "last_antigravity_task",
                 "Antigravity Agent Dispatched: Role='$subagentRole', Task='$taskPrompt', Dir='$workingDir'"
             )
         } catch (_: Exception) { }

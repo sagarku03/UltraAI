@@ -1,8 +1,11 @@
 package com.termux.app
 
-import com.example.gemini.data.receiver.TermuxSystemReceiver as CoreSystemReceiver
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
 
-/**
- * Direct com.termux.app.TermuxSystemReceiver implementation for storage and style reloads.
- */
-class TermuxSystemReceiver : CoreSystemReceiver()
+class TermuxSystemReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent?) {
+        // Direct receiver for Termux system intents
+    }
+}

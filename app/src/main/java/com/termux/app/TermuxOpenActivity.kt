@@ -1,9 +1,16 @@
 package com.termux.app
 
-import com.example.gemini.data.receiver.TermuxOpenActivity as CoreOpenActivity
+import android.app.Activity
+import android.content.Intent
+import android.os.Bundle
 
-/**
- * Direct com.termux.app.TermuxOpenActivity and TermuxUrlOpenActivity implementations.
- */
-class TermuxOpenActivity : CoreOpenActivity()
-class TermuxUrlOpenActivity : CoreOpenActivity()
+class TermuxOpenActivity : Activity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        intent?.data?.let { uri ->
+            val viewIntent = Intent(Intent.ACTION_VIEW, uri)
+            startActivity(viewIntent)
+        }
+        finish()
+    }
+}
