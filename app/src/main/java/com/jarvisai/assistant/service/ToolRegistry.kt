@@ -66,6 +66,11 @@ object ToolRegistry {
     const val TOOL_OPEN_IN_APP_BROWSER = "open_in_app_browser"
     const val TOOL_INSPECT_VISUAL_SCREEN = "inspect_visual_screen"
 
+    // Antigravity Autonomous Agent & Linux Engine Tools
+    const val TOOL_DISPATCH_ANTIGRAVITY_AGENT = "dispatch_antigravity_agent"
+    const val TOOL_GET_ANTIGRAVITY_STATUS = "get_antigravity_status"
+    const val TOOL_RUN_NATIVE_LINUX_COMMAND = "run_native_linux_command"
+
     // Next-Gen Autonomous Agentic Tools (Audit & Top 10 Features Upgrade)
     const val TOOL_AUTO_FILL_OTP = "auto_fill_otp"
     const val TOOL_COMPARE_PRICES = "compare_prices_across_apps"
@@ -880,6 +885,62 @@ object ToolRegistry {
                         put("description", "Follow-up message text to send after rejecting the call.")
                     })
                 })
+            }
+        ),
+        ToolDefinition(
+            name = TOOL_DISPATCH_ANTIGRAVITY_AGENT,
+            description = "Dispatches a high-level autonomous task to the Antigravity (agy) agent engine. Use this when the user asks for complex coding, file creation/editing, multi-file codebases, YouTube/Instagram viral SEO generation, video scriptwriting, AutoEditor video rendering, or headless browser automation.",
+            riskLevel = ToolRiskLevel.LOW_RISK,
+            parameterSchema = JSONObject().apply {
+                put("type", "OBJECT")
+                put("properties", JSONObject().apply {
+                    put("task_prompt", JSONObject().apply {
+                        put("type", "STRING")
+                        put("description", "Detailed instruction or goal for the Antigravity agent.")
+                    })
+                    put("subagent_role", JSONObject().apply {
+                        put("type", "STRING")
+                        put("description", "Optional specialized subagent persona, e.g. 'YouTube SEO Specialist', 'AutoEditor Video Producer', 'Fullstack Developer', 'Web Researcher'.")
+                    })
+                    put("working_directory", JSONObject().apply {
+                        put("type", "STRING")
+                        put("description", "Optional workspace directory path.")
+                    })
+                })
+                put("required", JSONArray().put("task_prompt"))
+            }
+        ),
+        ToolDefinition(
+            name = TOOL_GET_ANTIGRAVITY_STATUS,
+            description = "Checks the live status, running tasks, subagents, or latest step output of the Antigravity autonomous agent.",
+            riskLevel = ToolRiskLevel.READ_ONLY,
+            parameterSchema = JSONObject().apply {
+                put("type", "OBJECT")
+                put("properties", JSONObject().apply {
+                    put("conversation_id", JSONObject().apply {
+                        put("type", "STRING")
+                        put("description", "Optional conversation or task ID to query.")
+                    })
+                })
+            }
+        ),
+        ToolDefinition(
+            name = TOOL_RUN_NATIVE_LINUX_COMMAND,
+            description = "Executes a native Linux command directly inside the embedded Termux environment with high-speed PTY, accessing python3, nodejs, git, ffmpeg, and pkg tools.",
+            riskLevel = ToolRiskLevel.LOW_RISK,
+            parameterSchema = JSONObject().apply {
+                put("type", "OBJECT")
+                put("properties", JSONObject().apply {
+                    put("command", JSONObject().apply {
+                        put("type", "STRING")
+                        put("description", "Linux bash command string to execute.")
+                    })
+                    put("working_dir", JSONObject().apply {
+                        put("type", "STRING")
+                        put("description", "Optional working directory.")
+                    })
+                })
+                put("required", JSONArray().put("command"))
             }
         )
     )
