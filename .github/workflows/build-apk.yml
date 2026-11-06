@@ -81,18 +81,18 @@ jobs:
             chmod +x ./gradlew
           fi
 
-      - name: Build Debug APK
+      - name: Build Debug APKs (Termux & Standard Flavors)
         run: |
           for attempt in 1 2 3; do
             echo "=== Gradle Assemble Attempt $attempt ==="
             if [ -f ./gradlew ]; then
-              ./gradlew :app:assembleDebug \
+              ./gradlew :app:assembleTermuxDebug :app:assembleStandardDebug \
                 --no-daemon \
                 --stacktrace \
                 -Dorg.gradle.internal.http.connectionTimeout=120000 \
                 -Dorg.gradle.internal.http.socketTimeout=120000 && break
             else
-              gradle :app:assembleDebug \
+              gradle :app:assembleTermuxDebug :app:assembleStandardDebug \
                 --no-daemon \
                 --stacktrace \
                 -Dorg.gradle.internal.http.connectionTimeout=120000 \
@@ -106,14 +106,16 @@ jobs:
             sleep 5
           done
 
-      - name: Prepare APK Artifact
+      - name: Prepare APK Artifacts
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/JARVIS-AI-debug.apk
+          mkdir -p output_apks
+          find app/build/outputs/apk -name "*.apk" -exec cp {} output_apks/ \;
+          ls -la output_apks/
 
-      - name: Upload APK Artifact
+      - name: Upload APK Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: JARVIS-AI-APK
-          path: app/build/outputs/apk/debug/JARVIS-AI-debug.apk
+          name: JARVIS-AI-APKs
+          path: output_apks/*.apk
           if-no-files-found: error
           retention-days: 30
