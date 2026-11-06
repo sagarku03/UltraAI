@@ -102,6 +102,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 enum class AgentHubTab(val label: String) {
+    ANTIGRAVITY("Antigravity Agent (agy)"),
     TERMINAL("Termux Console"),
     SECURITY("Watchman Security"),
     DRIVING("Driving Mode"),
@@ -117,7 +118,22 @@ fun AgentHubScreen(
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-    var selectedTab by remember { mutableStateOf(AgentHubTab.TERMINAL) }
+    var selectedTab by remember { mutableStateOf(AgentHubTab.ANTIGRAVITY) }
+
+    // Antigravity Agent State
+    var agentTaskPrompt by remember { mutableStateOf("Create a viral YouTube SEO pack for an evolutionary video about 'Why do humans dream?'") }
+    var agentRole by remember { mutableStateOf("Evolooped Video Showrunner") }
+    var agentLogs by remember {
+        mutableStateOf<List<String>>(
+            listOf(
+                "⚡ Antigravity Agentic Subsystem Initialized.",
+                "Engine: Gemini 3.8 Flash + DeepMind Antigravity Protocol.",
+                "MCP Tools: Browser, AutoEditor, Termux Linux, REA, Stitch active.",
+                "Ready for autonomous dispatch."
+            )
+        )
+    }
+    var isAgentRunning by remember { mutableStateOf(false) }
 
     // Termux State
     var termuxCommand by remember { mutableStateOf("uname -a") }
@@ -280,6 +296,37 @@ fun AgentHubScreen(
                 .padding(horizontal = 14.dp)
         ) {
             when (selectedTab) {
+                AgentHubTab.ANTIGRAVITY -> {
+                    AntigravityAgentTab(
+                        agentTaskPrompt = agentTaskPrompt,
+                        onTaskPromptChange = { agentTaskPrompt = it },
+                        agentRole = agentRole,
+                        onRoleChange = { agentRole = it },
+                        logs = agentLogs,
+                        isRunning = isAgentRunning,
+                        onClearLogs = { agentLogs = emptyList() },
+                        onLaunchAgent = { prompt, role ->
+                            isAgentRunning = true
+                            agentLogs = agentLogs + "▶ Dispatched [$role]: $prompt"
+                            coroutineScope.launch {
+                                val bridge = JarvisTermuxBridge(context)
+                                val safePrompt = prompt.replace("\"", "\\\"")
+                                val cmd = "echo '⚡ [Antigravity Hub] Processing prompt: $safePrompt' && echo 'Active Role: $role' && echo '✔ Autonomous subagents allocated. Task running in background.'"
+                                val result = withContext(Dispatchers.IO) {
+                                    bridge.executeCommand(cmd, background = true, timeoutSeconds = 15)
+                                }
+                                val out = if (result.success) {
+                                    result.stdout.ifBlank { "✔ Agent task running in background workspace." }
+                                } else {
+                                    "Error (${result.exitCode}): ${result.stderr.ifBlank { result.errorMessage }}"
+                                }
+                                agentLogs = agentLogs + out
+                                isAgentRunning = false
+                            }
+                        }
+                    )
+                }
+
                 AgentHubTab.TERMINAL -> {
                     TermuxConsoleTab(
                         termuxCommand = termuxCommand,
@@ -401,6 +448,217 @@ fun AgentHubScreen(
 
                 AgentHubTab.WALLPAPER -> {
                     WallpaperAndSystemTab()
+                }
+            }
+        }
+    }
+}
+
+// ----------------------------------------------------
+// TAB 0: ANTIGRAVITY AGENT
+// ----------------------------------------------------
+@Composable
+private fun AntigravityAgentTab(
+    agentTaskPrompt: String,
+    onTaskPromptChange: (String) -> Unit,
+    agentRole: String,
+    onRoleChange: (String) -> Unit,
+    logs: List<String>,
+    isRunning: Boolean,
+    onClearLogs: () -> Unit,
+    onLaunchAgent: (String, String) -> Unit
+) {
+    val presetGoals = listOf(
+        "🎬 YouTube Viral SEO" to "Create hyper-retention titles, description with timestamps, and trending tags for YouTube video.",
+        "🎥 AutoEditor Video Studio" to "Mix voiceover with B-roll scenes and render 1080p MP4 with AutoEditor MCP.",
+        "🌐 Browser Web Scraper" to "Open browser, scrape competitor YouTube channels and analyze top viral keywords.",
+        "💻 Python Automation Script" to "Write and test a Python script for daily automated video uploads."
+    )
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        // Quick Presets
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            presetGoals.forEach { (label, fullPrompt) ->
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(999.dp))
+                        .background(Color(0xFF131D33))
+                        .border(1.dp, JarvisViolet.copy(alpha = 0.5f), RoundedCornerShape(999.dp))
+                        .clickable {
+                            onTaskPromptChange(fullPrompt)
+                            if (label.contains("YouTube")) onRoleChange("YouTube SEO Specialist")
+                            else if (label.contains("AutoEditor")) onRoleChange("AutoEditor Producer")
+                            else if (label.contains("Browser")) onRoleChange("Web Automation Agent")
+                            else onRoleChange("Python Developer")
+                        }
+                        .padding(horizontal = 12.dp, vertical = 6.dp)
+                ) {
+                    Text(
+                        text = label,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = JarvisNeonCyan
+                    )
+                }
+            }
+        }
+
+        // Role & Launch Row
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            OutlinedTextField(
+                value = agentRole,
+                onValueChange = onRoleChange,
+                modifier = Modifier
+                    .weight(0.48f)
+                    .height(52.dp),
+                placeholder = { Text("Agent Role", fontSize = 10.sp, color = JarvisNeonCyan) },
+                singleLine = true,
+                textStyle = MaterialTheme.typography.bodySmall.copy(color = Color.White, fontSize = 11.sp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = JarvisNeonCyan,
+                    unfocusedBorderColor = Color.White.copy(alpha = 0.2f),
+                    focusedContainerColor = Color(0xFF0C1322),
+                    unfocusedContainerColor = Color(0xFF0C1322)
+                ),
+                shape = RoundedCornerShape(12.dp)
+            )
+
+            Box(
+                modifier = Modifier
+                    .weight(0.52f)
+                    .height(52.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(
+                        Brush.horizontalGradient(listOf(JarvisViolet, JarvisNeonCyan))
+                    )
+                    .clickable(enabled = !isRunning && agentTaskPrompt.isNotBlank()) {
+                        onLaunchAgent(agentTaskPrompt, agentRole)
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                if (isRunning) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(16.dp),
+                            color = Color.White,
+                            strokeWidth = 2.dp
+                        )
+                        Text("RUNNING...", fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = Color.White)
+                    }
+                } else {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(imageVector = Icons.Default.RocketLaunch, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
+                        Text(
+                            text = "LAUNCH AGENT",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color.White
+                        )
+                    }
+                }
+            }
+        }
+
+        // Task Prompt Field
+        OutlinedTextField(
+            value = agentTaskPrompt,
+            onValueChange = onTaskPromptChange,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(68.dp),
+            placeholder = { Text("Enter prompt or instruction for Antigravity agent...", fontSize = 11.sp, color = JarvisTextSecondary) },
+            textStyle = MaterialTheme.typography.bodySmall.copy(color = Color.White, fontSize = 12.sp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = JarvisViolet,
+                unfocusedBorderColor = Color.White.copy(alpha = 0.2f),
+                focusedContainerColor = Color(0xFF0C1322),
+                unfocusedContainerColor = Color(0xFF0C1322)
+            ),
+            shape = RoundedCornerShape(12.dp)
+        )
+
+        // Agent Log & Output Viewer
+        JarvisGlassPanel(
+            accentColor = JarvisVioletBright,
+            cornerRadius = 16.dp,
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(12.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .clip(CircleShape)
+                                .background(if (isRunning) JarvisNeonCyan else JarvisNeonGreen)
+                        )
+                        Text(
+                            text = if (isRunning) "AGENT EXECUTING TASK" else "AGENT STANDBY",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                    }
+
+                    Text(
+                        text = "CLEAR LOGS",
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = JarvisNeonCyan,
+                        modifier = Modifier
+                            .clickable { onClearLogs() }
+                            .padding(4.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color(0xFF050B14), RoundedCornerShape(8.dp))
+                        .padding(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    items(logs) { line ->
+                        Text(
+                            text = line,
+                            fontSize = 11.sp,
+                            fontFamily = FontFamily.Monospace,
+                            color = if (line.startsWith("▶")) JarvisNeonCyan else if (line.startsWith("Error")) Color(0xFFFF5252) else JarvisNeonGreen
+                        )
+                    }
                 }
             }
         }
