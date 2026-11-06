@@ -23,6 +23,6 @@ dependencyResolutionManagement {
   }
 }
 
-rootProject.name = "JARVIS AI"
+rootProject.name = "UltraAI"
 
 include(":app")

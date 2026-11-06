@@ -1,6 +1,6 @@
 {
-  "name": "JARVIS AI",
-  "description": "Futuristic native Android AI assistant with HUD interface, Gemini Text Chat, Real-time Live Voice API, Memory Center, and Phone Controls.",
+  "name": "UltraAI",
+  "description": "Futuristic native Android AI assistant with Iron Man HUD, Real-time Gemini Live Voice API, Native Termux Linux Environment, and Antigravity Autonomous Agent Engine.",
   "requestFramePermissions": [
     "microphone"
   ],

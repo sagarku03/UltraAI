@@ -1,10 +1,10 @@
-# Jarvis AI Versioning Information
+# UltraAI Versioning Information
 
-- **App Name:** Jarvis AI
-- **Version Name:** 3.0.0
-- **Version Code:** 30000
-- **Release Status:** Stable Production Release
-- **Architecture:** Next-Gen Agentic Mobile Controller, Dual-Track Multimodal Vision, Dynamic Window Quiescence Settling Engine, 5-Tier Cognitive Memory Vault, Real Human Feelings & Persona System.
+- **App Name:** UltraAI
+- **Version Name:** 3.1.0
+- **Version Code:** 31000
+- **Release Status:** Stable Hybrid Production Release
+- **Architecture:** Dual-Engine Architecture: Jarvis Iron Man HUD & Mobile Controller + Google Antigravity Agent Engine & Native Termux Linux Runtime.
 
 ## Version History & Roadmap
 - **1.0.0** – First stable release
