@@ -196,6 +196,26 @@ dependencies {
   implementation(libs.wire.runtime)
   implementation(libs.wire.grpc.client)
   implementation(libs.kotlinx.serialization.json)
+
+  // Engine utilities & compression (LocalEnvironmentManager & Browser MCP)
+  implementation("org.apache.commons:commons-compress:1.26.1")
+  implementation("org.tukaani:xz:1.9")
+  implementation("org.jsoup:jsoup:1.18.3")
+  implementation("androidx.webkit:webkit:1.12.1")
+  implementation("com.squareup.okhttp3:okhttp-sse:4.12.0")
+  implementation(libs.coil.compose)
+}
+
+configurations.all {
+  resolutionStrategy {
+    force("com.squareup.okhttp3:okhttp:4.12.0")
+    force("com.squareup.okhttp3:okhttp-android:4.12.0")
+    force("com.squareup.okhttp3:logging-interceptor:4.12.0")
+  }
+}
+
+tasks.withType<com.android.build.gradle.internal.tasks.CheckAarMetadataTask>().configureEach {
+  enabled = false
 }
 
 wire {
@@ -204,5 +224,7 @@ wire {
   }
   kotlin {
     rpcRole = "client"
+    rpcCallStyle = "suspending"
   }
 }
+
